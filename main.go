@@ -201,6 +201,7 @@ func giles_pup(message MQTT.Message) {
 					status, err := DoPost("http://130.226.142.195:8079/add/lopy", s)
 					if err != nil {
 						fmt.Printf("Error Post:%s\n", status)
+						//TODO add to local cache here
 					} else {
 						UUIDS[u1] = true
 					}
