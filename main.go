@@ -134,25 +134,29 @@ func giles_pup(message MQTT.Message) {
 			var sensorType string
 			var units string
 			var found bool
+			var v float64
 			// temperature
 			model := "Chirp"
 			if m.PayloadRaw[0] == 170 {
 				sensorType = "Temperature"
 				units = "C"
 				found = true
+				v = float64((int(m.PayloadRaw[1])<<8)+int(m.PayloadRaw[2])) / 10
 			} else if m.PayloadRaw[0] == 187 {
 				sensorType = "Humidity"
 				units = "Percentage"
 				found = true
-			} else if m.PayloadRaw[0] == 204 {
+				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
+			} else if m.PayloadRaw[0] == 204 { // Light
 				sensorType = "Light"
-				units = "Lux"
+				units = "Light"
 				found = true
+				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
+				v = ((65535 - v) / 65535)
 			}
 			if found {
 				u1 := uuid.NewV5(NS, m.DevID+model+sensorType).String()
 				fmt.Println(u1)
-				v := float64((int(m.PayloadRaw[1])<<8)+int(m.PayloadRaw[2])) / 10
 				fmt.Printf("%v\n", v)
 				fmt.Printf("%s\n", j)
 
