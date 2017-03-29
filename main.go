@@ -144,7 +144,7 @@ func giles_pup(message MQTT.Message) {
 				v = float64((int(m.PayloadRaw[1])<<8)+int(m.PayloadRaw[2])) / 10
 			} else if m.PayloadRaw[0] == 187 {
 				sensorType = "Humidity"
-				units = "Percentage"
+				units = "Moisture"
 				found = true
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
 			} else if m.PayloadRaw[0] == 204 { // Light
@@ -152,7 +152,7 @@ func giles_pup(message MQTT.Message) {
 				units = "Light"
 				found = true
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
-				v = ((65535 - v) / 65535)
+				v = 100 * ((65535 - v) / 65535)
 			}
 			if found {
 				u1 := uuid.NewV5(NS, m.DevID+model+sensorType).String()
