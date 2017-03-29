@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	//"log"
 
 	"os"
@@ -40,6 +41,13 @@ var i int64
 
 var NS uuid.UUID
 var UUIDS map[string]bool
+
+func init() {
+	MQTT.DEBUG = log.New(os.Stdout, "DEBUG ", 0)
+	MQTT.WARN = log.New(os.Stdout, "WARN ", 0)
+	MQTT.CRITICAL = log.New(os.Stdout, "CRITICAL ", 0)
+	MQTT.ERROR = log.New(os.Stdout, "ERROR ", 0)
+}
 
 func main() {
 	//msg := "ABC"
