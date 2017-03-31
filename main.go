@@ -148,24 +148,27 @@ func giles_pup(message MQTT.Message) {
 				model := "Chirp"
 				sensorType = "Temperature"
 				units = "C"
-				found = true
 				v = float64((int(m.PayloadRaw[1])<<8)+int(m.PayloadRaw[2])) / 10
+				found = true
 			} else if m.PayloadRaw[0] == 187 { // Chirp Humidity Sensor
 				model := "Chirp"
 				sensorType = "Humidity"
-				units = "Percentage"
-				found = true
+				units = "Moisture"
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
+				found = true
 			} else if m.PayloadRaw[0] == 204 { // Chirp Light Sensor
 				model := "Chirp"
 				sensorType = "Light"
 				units = "Light"
-				found = true
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
-				v = ((65535 - v) / 65535)
-			} else if m.PayloadRaw[0] == 1 { // Shark Dust Sensor
-			model:
-				"GP2Y1010AU0F"
+				v = 100 * ((65535 - v) / 65535)
+				found = true
+			} else if m.PayloadRaw[0] == 1 { // Sharp Dust Sensor
+				model := "GP2Y1010AU0F"
+				sensorType = "Dust"
+				units = "Particles"
+				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
+				found = true
 			}
 			if found {
 				u1 := uuid.NewV5(NS, m.DevID+model+sensorType).String()
