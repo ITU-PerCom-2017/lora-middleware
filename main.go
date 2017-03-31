@@ -112,6 +112,31 @@ func main() {
 		fmt.Printf("Connected to %s\n", *server)
 	}
 
+	// FIXME just for testing
+
+	//connOpts2 := &MQTT.ClientOptions{
+	//ClientID:             *clientid,
+	//CleanSession:         true,
+	//Username:             "aq-pm-01",
+	//Password:             "ttn-account-v2.X3wgEtqpzEuqluOAC6cXxy3HJ2l6b-FyhzJSAiMYUwk",
+	//MaxReconnectInterval: 1 * time.Second,
+	////KeepAlive:            60 * time.Second,
+	//TLSConfig: tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert},
+	//}
+	//connOpts2.AddBroker(*server)
+	//connOpts2.OnConnect = func(c MQTT.Client) {
+	//if token := c.Subscribe(*topic, byte(*qos), onMessageReceived); token.Wait() && token.Error() != nil {
+	//panic(token.Error())
+	//}
+	//}
+
+	//client2 := MQTT.NewClient(connOpts2)
+	//if token := client2.Connect(); token.Wait() && token.Error() != nil {
+	//panic(token.Error())
+	//} else {
+	//fmt.Printf("Connected to %s\n", *server)
+	//}
+
 	for {
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -125,56 +150,59 @@ func giles_pup(message MQTT.Message) {
 	if err := json.Unmarshal(s, &m); err != nil {
 		fmt.Printf("Error with %s\n", s)
 	} else {
-		j, err := json.MarshalIndent(m, "", " ")
-		if err != nil {
-			fmt.Printf("Error to marshal %s\n", m)
+		//j, err := json.MarshalIndent(m, "", " ")
+		//if err != nil {
+		//fmt.Printf("Error to marshal %s\n", m)
 
-		} else if len(m.PayloadRaw) == 3 {
+		//} else
+		if len(m.PayloadRaw) == 3 {
 
-			fmt.Printf("%v\n", m.PayloadRaw)
-			fmt.Printf("%q\n", m.PayloadRaw)
+			//fmt.Printf("%v\n", m.PayloadRaw)
+			//fmt.Printf("%q\n", m.PayloadRaw)
 			var sm SmapMeta
 			var property Property
 			var metadatum Metadatum
 			var instrument Instrument
 			var location Location
 
+			var model string
 			var sensorType string
 			var units string
 			var found bool
 			var v float64
 			// temperature
 			if m.PayloadRaw[0] == 170 { // Chirp Temperature Sensor
-				model := "Chirp"
+				model = "Chirp"
 				sensorType = "Temperature"
 				units = "C"
 				v = float64((int(m.PayloadRaw[1])<<8)+int(m.PayloadRaw[2])) / 10
 				found = true
 			} else if m.PayloadRaw[0] == 187 { // Chirp Humidity Sensor
-				model := "Chirp"
+				model = "Chirp"
 				sensorType = "Humidity"
 				units = "Moisture"
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
 				found = true
 			} else if m.PayloadRaw[0] == 204 { // Chirp Light Sensor
-				model := "Chirp"
+				model = "Chirp"
 				sensorType = "Light"
 				units = "Light"
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
 				v = 100 * ((65535 - v) / 65535)
 				found = true
 			} else if m.PayloadRaw[0] == 1 { // Sharp Dust Sensor
-				model := "GP2Y1010AU0F"
+				model = "GP2Y1010AU0F"
 				sensorType = "Dust"
 				units = "Particles"
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
 				found = true
+				fmt.Printf("DUST\n\n\n")
 			}
 			if found {
 				u1 := uuid.NewV5(NS, m.DevID+model+sensorType).String()
-				fmt.Println(u1)
-				fmt.Printf("%v\n", v)
-				fmt.Printf("%s\n", j)
+				//fmt.Println(u1)
+				//fmt.Printf("%v\n", v)
+				//fmt.Printf("%s\n", j)
 
 				tr := make([][]float64, 1)
 				tr[0] = make([]float64, 2)
