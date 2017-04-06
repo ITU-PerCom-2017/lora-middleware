@@ -18,6 +18,10 @@ type Config struct {
 		GilesUsername *string
 		GilesPassword *string
 	}
+
+	Metadata struct {
+		MetadataFolder *string
+	}
 }
 
 func LoadConfig(filename string) *Config {

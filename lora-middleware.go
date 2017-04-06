@@ -53,10 +53,11 @@ func onMessageReceived(a *appContext) MQTT.MessageHandler {
 var config *Config
 
 type appContext struct {
-	Config  *Config
-	UUID_NS *uuid.UUID
-	UUIDS   map[string]bool
-	Client  *http.Client
+	Config   *Config
+	UUID_NS  *uuid.UUID
+	UUIDS    map[string]bool
+	Client   *http.Client
+	Metadata map[string]Metadatum
 }
 
 const LORA string = "[LORA]    "
@@ -101,6 +102,8 @@ func main() {
 	}
 	a.UUID_NS = &NS
 
+	a.Metadata = GetMetadata(*a.Config.Metadata.MetadataFolder)
+
 	connOpts := &MQTT.ClientOptions{
 		ClientID:             *clientid,
 		CleanSession:         true,
@@ -137,14 +140,19 @@ func giles_pup(message MQTT.Message, a *appContext) {
 		fmt.Printf("Error with %s\n", s)
 	} else {
 		if len(m.PayloadRaw) == 3 {
-
 			//fmt.Printf("%v\n", m.PayloadRaw)
 			//fmt.Printf("%q\n", m.PayloadRaw)
 			var sm SmapMeta
 			var property Property
 			var metadatum Metadatum
+			gm, exists := a.Metadata[m.DevID]
+			if exists {
+				metadatum = gm
+			} else {
+				var location Location
+				metadatum.Location = location
+			}
 			var instrument Instrument
-			var location Location
 
 			var model string
 			var sensorType string
@@ -198,7 +206,6 @@ func giles_pup(message MQTT.Message, a *appContext) {
 
 				} else {
 					metadatum.Instrument = instrument
-					metadatum.Location = location
 					sm.Metadata = &metadatum
 					sm.Properties = &property
 					sm.Metadata.Instrument.Model = model
@@ -209,8 +216,6 @@ func giles_pup(message MQTT.Message, a *appContext) {
 					sm.Properties.Timezone = "Europe/Copenhagen"
 					sm.Metadata.Location.Building = "IT University of Copenhagen"
 					sm.Metadata.Location.City = "Copenhagen"
-					sm.Metadata.Location.Floor = "5"
-					sm.Metadata.Location.Room = "5A56"
 					sm.Metadata.System = "Lora"
 					sm.Metadata.Instrument.Manufacturer = "LoPy"
 					sm.Readings = tr

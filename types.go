@@ -144,3 +144,13 @@ type SmapReading struct {
 	Readings [][]float64 `json:readings`
 	UUID     string      `json:"uuid"`
 }
+
+//type GitMetadata struct {
+//Extra GitExtra `json:extra`
+//}
+
+//type GitExtra struct {
+//Device_id string `json:device_id`
+//Plant     string `json:plant`
+//Group     string `json:group`
+//}
