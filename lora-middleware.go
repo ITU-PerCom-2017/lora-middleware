@@ -186,6 +186,12 @@ func giles_pup(message MQTT.Message, a *appContext) {
 				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
 				found = true
 				fmt.Printf("DUST\n\n\n")
+			} else if m.PayloadRaw[0] == 2 { // PIR sensor
+				model = "PIR Sensor"
+				sensorType = "PIR"
+				units = "Motion"
+				v = float64((int(m.PayloadRaw[1]) << 8) + int(m.PayloadRaw[2]))
+				found = true
 			}
 			if found {
 				u1 := uuid.NewV5(*a.UUID_NS, m.DevID+model+sensorType).String()
